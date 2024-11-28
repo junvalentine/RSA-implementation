@@ -2,10 +2,13 @@
     Adapted from https://github.com/faheel/BigInt    
 */
 #include <string>
+#include <climits>
+#include <cmath>
 
 #include "Utils.h"
 #include "BigInt.h"
 
+const long long FLOOR_SQRT_LLONG_MAX = 3037000499;
 /* Constructor */
 
 // Default constructor
@@ -18,6 +21,15 @@ BigInt::BigInt() {
 BigInt::BigInt(const BigInt& num) {
     value = num.value;
     sign = num.sign;
+}
+
+// Integer to BigInt
+BigInt::BigInt(const long long& num) {
+    value = std::to_string(std::abs(num));
+    if (num < 0)
+        sign = '-';
+    else
+        sign = '+';
 }
 
 // String to BigInt
@@ -44,11 +56,46 @@ BigInt::BigInt(const std::string& num) {
     strip_leading_zeroes(value);
 }
 
+/* Math */
+/*
+    big_pow10
+    ---------
+    Returns a BigInt equal to 10^exp.
+    NOTE: exponent should be a non-negative integer.
+*/
+
+BigInt big_pow10(size_t exp) {
+    return BigInt("1" + std::string(exp, '0'));
+}
+
+// Returns the absolute value of a BigInt.
+BigInt abs(const BigInt& num) {
+    return num < 0 ? -num : num;
+}
+
 /* Operators */
 // Assignment operator for BigInt
 BigInt& BigInt::operator=(const BigInt& num) {
     value = num.value;
     sign = num.sign;
+
+    return *this;
+}
+
+// BigInt = Integer
+BigInt& BigInt::operator=(const long long& num) {
+    BigInt temp(num);
+    value = temp.value;
+    sign = temp.sign;
+
+    return *this;
+}
+
+// BigInt = String
+BigInt& BigInt::operator=(const std::string& num) {
+    BigInt temp(num);
+    value = temp.value;
+    sign = temp.sign;
 
     return *this;
 }
@@ -354,6 +401,205 @@ BigInt BigInt::operator%(const BigInt& num) const {
     return remainder;
 }
 
+/*
+    BigInt + Integer
+    ----------------
+*/
+
+BigInt BigInt::operator+(const long long& num) const {
+    return *this + BigInt(num);
+}
+
+
+/*
+    Integer + BigInt
+    ----------------
+*/
+
+BigInt operator+(const long long& lhs, const BigInt& rhs) {
+    return BigInt(lhs) + rhs;
+}
+
+
+/*
+    BigInt - Integer
+    ----------------
+*/
+
+BigInt BigInt::operator-(const long long& num) const {
+    return *this - BigInt(num);
+}
+
+
+/*
+    Integer - BigInt
+    ----------------
+*/
+
+BigInt operator-(const long long& lhs, const BigInt& rhs) {
+    return BigInt(lhs) - rhs;
+}
+
+
+/*
+    BigInt * Integer
+    ----------------
+*/
+
+BigInt BigInt::operator*(const long long& num) const {
+    return *this * BigInt(num);
+}
+
+
+/*
+    Integer * BigInt
+    ----------------
+*/
+
+BigInt operator*(const long long& lhs, const BigInt& rhs) {
+    return BigInt(lhs) * rhs;
+}
+
+
+/*
+    BigInt / Integer
+    ----------------
+*/
+
+BigInt BigInt::operator/(const long long& num) const {
+    return *this / BigInt(num);
+}
+
+
+/*
+    Integer / BigInt
+    ----------------
+*/
+
+BigInt operator/(const long long& lhs, const BigInt& rhs) {
+    return BigInt(lhs) / rhs;
+}
+
+
+/*
+    BigInt % Integer
+    ----------------
+*/
+
+BigInt BigInt::operator%(const long long& num) const {
+    return *this % BigInt(num);
+}
+
+
+/*
+    Integer % BigInt
+    ----------------
+*/
+
+BigInt operator%(const long long& lhs, const BigInt& rhs) {
+    return BigInt(lhs) % rhs;
+}
+
+
+/*
+    BigInt + String
+    ---------------
+*/
+
+BigInt BigInt::operator+(const std::string& num) const {
+    return *this + BigInt(num);
+}
+
+
+/*
+    String + BigInt
+    ---------------
+*/
+
+BigInt operator+(const std::string& lhs, const BigInt& rhs) {
+    return BigInt(lhs) + rhs;
+}
+
+
+/*
+    BigInt - String
+    ---------------
+*/
+
+BigInt BigInt::operator-(const std::string& num) const {
+    return *this - BigInt(num);
+}
+
+
+/*
+    String - BigInt
+    ---------------
+*/
+
+BigInt operator-(const std::string& lhs, const BigInt& rhs) {
+    return BigInt(lhs) - rhs;
+}
+
+
+/*
+    BigInt * String
+    ---------------
+*/
+
+BigInt BigInt::operator*(const std::string& num) const {
+    return *this * BigInt(num);
+}
+
+
+/*
+    String * BigInt
+    ---------------
+*/
+
+BigInt operator*(const std::string& lhs, const BigInt& rhs) {
+    return BigInt(lhs) * rhs;
+}
+
+
+/*
+    BigInt / String
+    ---------------
+*/
+
+BigInt BigInt::operator/(const std::string& num) const {
+    return *this / BigInt(num);
+}
+
+
+/*
+    String / BigInt
+    ---------------
+*/
+
+BigInt operator/(const std::string& lhs, const BigInt& rhs) {
+    return BigInt(lhs) / rhs;
+}
+
+
+/*
+    BigInt % String
+    ---------------
+*/
+
+BigInt BigInt::operator%(const std::string& num) const {
+    return *this % BigInt(num);
+}
+
+
+/*
+    String % BigInt
+    ---------------
+*/
+
+BigInt operator%(const std::string& lhs, const BigInt& rhs) {
+    return BigInt(lhs) % rhs;
+}
+
 // Arithmetic-assignment operator +=
 BigInt& BigInt::operator+=(const BigInt& num) {
     *this = *this + num;
@@ -386,6 +632,125 @@ BigInt& BigInt::operator/=(const BigInt& num) {
 // Arithmetic-assignment operator %=
 BigInt& BigInt::operator%=(const BigInt& num) {
     *this = *this % num;
+
+    return *this;
+}
+
+/*
+    BigInt += Integer
+    -----------------
+*/
+
+BigInt& BigInt::operator+=(const long long& num) {
+    *this = *this + BigInt(num);
+
+    return *this;
+}
+
+
+/*
+    BigInt -= Integer
+    -----------------
+*/
+
+BigInt& BigInt::operator-=(const long long& num) {
+    *this = *this - BigInt(num);
+
+    return *this;
+}
+
+
+/*
+    BigInt *= Integer
+    -----------------
+*/
+
+BigInt& BigInt::operator*=(const long long& num) {
+    *this = *this * BigInt(num);
+
+    return *this;
+}
+
+
+/*
+    BigInt /= Integer
+    -----------------
+*/
+
+BigInt& BigInt::operator/=(const long long& num) {
+    *this = *this / BigInt(num);
+
+    return *this;
+}
+
+
+/*
+    BigInt %= Integer
+    -----------------
+*/
+
+BigInt& BigInt::operator%=(const long long& num) {
+    *this = *this % BigInt(num);
+
+    return *this;
+}
+
+
+/*
+    BigInt += String
+    ----------------
+*/
+
+BigInt& BigInt::operator+=(const std::string& num) {
+    *this = *this + BigInt(num);
+
+    return *this;
+}
+
+
+/*
+    BigInt -= String
+    ----------------
+*/
+
+BigInt& BigInt::operator-=(const std::string& num) {
+    *this = *this - BigInt(num);
+
+    return *this;
+}
+
+
+/*
+    BigInt *= String
+    ----------------
+*/
+
+BigInt& BigInt::operator*=(const std::string& num) {
+    *this = *this * BigInt(num);
+
+    return *this;
+}
+
+
+/*
+    BigInt /= String
+    ----------------
+*/
+
+BigInt& BigInt::operator/=(const std::string& num) {
+    *this = *this / BigInt(num);
+
+    return *this;
+}
+
+
+/*
+    BigInt %= String
+    ----------------
+*/
+
+BigInt& BigInt::operator%=(const std::string& num) {
+    *this = *this % BigInt(num);
 
     return *this;
 }
@@ -462,6 +827,245 @@ bool BigInt::operator>=(const BigInt& num) const {
     return !(*this < num);
 }
 
+/*
+    BigInt == Integer
+    -----------------
+*/
+
+bool BigInt::operator==(const long long& num) const {
+    return *this == BigInt(num);
+}
+
+
+/*
+    Integer == BigInt
+    -----------------
+*/
+
+bool operator==(const long long& lhs, const BigInt& rhs) {
+    return BigInt(lhs) == rhs;
+}
+
+
+/*
+    BigInt != Integer
+    -----------------
+*/
+
+bool BigInt::operator!=(const long long& num) const {
+    return !(*this == BigInt(num));
+}
+
+
+/*
+    Integer != BigInt
+    -----------------
+*/
+
+bool operator!=(const long long& lhs, const BigInt& rhs) {
+    return BigInt(lhs) != rhs;
+}
+
+
+/*
+    BigInt < Integer
+    ----------------
+*/
+
+bool BigInt::operator<(const long long& num) const {
+    return *this < BigInt(num);
+}
+
+
+/*
+    Integer < BigInt
+    ----------------
+*/
+
+bool operator<(const long long& lhs, const BigInt& rhs) {
+    return BigInt(lhs) < rhs;
+}
+
+
+/*
+    BigInt > Integer
+    ----------------
+*/
+
+bool BigInt::operator>(const long long& num) const {
+    return *this > BigInt(num);
+}
+
+
+/*
+    Integer > BigInt
+    ----------------
+*/
+
+bool operator>(const long long& lhs, const BigInt& rhs) {
+    return BigInt(lhs) > rhs;
+}
+
+
+/*
+    BigInt <= Integer
+    -----------------
+*/
+
+bool BigInt::operator<=(const long long& num) const {
+    return !(*this > BigInt(num));
+}
+
+
+/*
+    Integer <= BigInt
+    -----------------
+*/
+
+bool operator<=(const long long& lhs, const BigInt& rhs) {
+    return BigInt(lhs) <= rhs;
+}
+
+
+/*
+    BigInt >= Integer
+    -----------------
+*/
+
+bool BigInt::operator>=(const long long& num) const {
+    return !(*this < BigInt(num));
+}
+
+
+/*
+    Integer >= BigInt
+    -----------------
+*/
+
+bool operator>=(const long long& lhs, const BigInt& rhs) {
+    return BigInt(lhs) >= rhs;
+}
+
+
+/*
+    BigInt == String
+    ----------------
+*/
+
+bool BigInt::operator==(const std::string& num) const {
+    return *this == BigInt(num);
+}
+
+
+/*
+    String == BigInt
+    ----------------
+*/
+
+bool operator==(const std::string& lhs, const BigInt& rhs) {
+    return BigInt(lhs) == rhs;
+}
+
+
+/*
+    BigInt != String
+    ----------------
+*/
+
+bool BigInt::operator!=(const std::string& num) const {
+    return !(*this == BigInt(num));
+}
+
+
+/*
+    String != BigInt
+    ----------------
+*/
+
+bool operator!=(const std::string& lhs, const BigInt& rhs) {
+    return BigInt(lhs) != rhs;
+}
+
+
+/*
+    BigInt < String
+    ---------------
+*/
+
+bool BigInt::operator<(const std::string& num) const {
+    return *this < BigInt(num);
+}
+
+
+/*
+    String < BigInt
+    ---------------
+*/
+
+bool operator<(const std::string& lhs, const BigInt& rhs) {
+    return BigInt(lhs) < rhs;
+}
+
+
+/*
+    BigInt > String
+    ---------------
+*/
+
+bool BigInt::operator>(const std::string& num) const {
+    return *this > BigInt(num);
+}
+
+
+/*
+    String > BigInt
+    ---------------
+*/
+
+bool operator>(const std::string& lhs, const BigInt& rhs) {
+    return BigInt(lhs) > rhs;
+}
+
+
+/*
+    BigInt <= String
+    ----------------
+*/
+
+bool BigInt::operator<=(const std::string& num) const {
+    return !(*this > BigInt(num));
+}
+
+
+/*
+    String <= BigInt
+    ----------------
+*/
+
+bool operator<=(const std::string& lhs, const BigInt& rhs) {
+    return BigInt(lhs) <= rhs;
+}
+
+
+/*
+    BigInt >= String
+    ----------------
+*/
+
+bool BigInt::operator>=(const std::string& num) const {
+    return !(*this < BigInt(num));
+}
+
+
+/*
+    String >= BigInt
+    ----------------
+*/
+
+bool operator>=(const std::string& lhs, const BigInt& rhs) {
+    return BigInt(lhs) >= rhs;
+}
+
 // I/O stream operators (input)
 std::istream& operator>>(std::istream& in, BigInt& num) {
     std::string input;
@@ -488,73 +1092,43 @@ std::string BigInt::to_string() const {
     return this->sign == '-' ? "-" + this->value : this->value;
 }
 
-/* Math */
+/*
+    to_int
+    ------
+    Converts a BigInt to an int.
+    NOTE: If the BigInt is out of range of an int, stoi() will throw an
+    out_of_range exception.
+*/
 
-// Returns the absolute value of a BigInt.
-BigInt abs(const BigInt& num) {
-    return num < 0 ? -num : num;
+int BigInt::to_int() const {
+    return std::stoi(this->to_string());
 }
 
-// /*  Returns base^exp. Uses the fast Square and Multiply algorithm. 
-//     https://en.wikipedia.org/wiki/Exponentiation_by_squaring#Recursive_version
-// */
-// BigInt pow(const BigInt& base, BigInt exp) {
-//     // Checking for edge cases
-//     if (exp < 0) {
-//         if (base == 0)
-//             throw std::logic_error("Cannot divide by zero");
-//         return abs(base) == 1 ? base : 0;
-//     }
-//     if (exp == 0) {
-//         if (base == 0)
-//             throw std::logic_error("Zero cannot be raised to zero");
-//         return 1;
-//     }
 
-//     BigInt result("1");
-//     while (exp){
-//         if (exp % 2 == 1){
-            
-//         }
-//     }
-//     BigInt result = base, result_odd = 1;
-//     while (exp > 1) {
-//         if (exp % 2 ==)
-//             result_odd *= result;
-//         result *= result;
-//         exp /= 2;
-//     }
+/*
+    to_long
+    -------
+    Converts a BigInt to a long int.
+    NOTE: If the BigInt is out of range of a long int, stol() will throw an
+    out_of_range exception.
+*/
 
-//     return result * result_odd;
-// }
+long BigInt::to_long() const {
+    return std::stol(this->to_string());
+}
 
-// // Returns the greatest common divisor (GCD, a.k.a. HCF) of two BigInts using Euclid's algorithm.
-// BigInt gcd(const BigInt &num1, const BigInt &num2){
-//     BigInt abs_num1 = abs(num1);
-//     BigInt abs_num2 = abs(num2);
 
-//     // base cases:
-//     if (abs_num2 == 0)
-//         return abs_num1;    // gcd(a, 0) = |a|
-//     if (abs_num1 == 0)
-//         return abs_num2;    // gcd(0, a) = |a|
+/*
+    to_long_long
+    ------------
+    Converts a BigInt to a long long int.
+    NOTE: If the BigInt is out of range of a long long int, stoll() will throw
+    an out_of_range exception.
+*/
 
-//     BigInt remainder = abs_num2;
-//     while (remainder != 0) {
-//         remainder = abs_num1 % abs_num2;
-//         abs_num1 = abs_num2;    // previous remainder
-//         abs_num2 = remainder;   // current remainder
-//     }
+long long BigInt::to_long_long() const {
+    return std::stoll(this->to_string());
+}
 
-//     return abs_num1;
-// }
 
-// // Returns the least common multiple (LCM) of two BigInts.
-// BigInt lcm(const BigInt& num1, const BigInt& num2) {
-//     if (num1 == 0 or num2 == 0)
-//         return 0;
 
-//     return abs(num1 * num2) / gcd(num1, num2);
-// }
-
-#endif  

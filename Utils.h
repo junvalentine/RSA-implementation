@@ -87,7 +87,7 @@ std::tuple<std::string, std::string> get_larger_and_smaller(const std::string& n
 
     // pad the smaller number with zeroes
     add_leading_zeroes(smaller, larger.size() - smaller.size());
-
+    
     return std::make_tuple(larger, smaller);
 }
 
