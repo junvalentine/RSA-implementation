@@ -1,10 +1,10 @@
-// Reimplementation of complex function in BigInt
-#include "BigInt.cpp"
-#include <iostream>
+// Math helper functions
+#include <gmpxx.h> 
+
 /*  Normal exponential function using the fast Square and Multiply algorithm.
     https://en.wikipedia.org/wiki/Exponentiation_by_squaring#Recursive_version
 */
-BigInt power(BigInt base, BigInt exp) {
+mpz_class power(mpz_class base, mpz_class exp) {
     // Check edge cases
     if (exp < 0) {
         throw "Not support negative exponent";
@@ -16,7 +16,7 @@ BigInt power(BigInt base, BigInt exp) {
         return 1;
     }
 
-    BigInt result = 1;
+    mpz_class result = 1;
     while (exp > 0) {
         if (exp % 2 == 1){
             result *= base;
@@ -28,10 +28,10 @@ BigInt power(BigInt base, BigInt exp) {
     return result;
 }
 
-/*  Modular exponential function using the fast Square and Multiply algorithm.
-    https://en.wikipedia.org/wiki/Modular_exponentiation#Pseudocode
-*/
-BigInt powerMod(BigInt base, BigInt exp, BigInt modulo){
+// /*  Modular exponential function using the fast Square and Multiply algorithm.
+//     https://en.wikipedia.org/wiki/Modular_exponentiation#Pseudocode
+// */
+mpz_class powerMod(mpz_class base, mpz_class exp, mpz_class modulo){
     // Check edge cases
     if (exp < 0) {
         throw "Not support negative exponent";
@@ -43,26 +43,25 @@ BigInt powerMod(BigInt base, BigInt exp, BigInt modulo){
         return 1;
     }
 
-    BigInt result = 1;
+    mpz_class result = 1;
     base = base % modulo;
 
     while (exp > 0) {
         if (exp % 2 == 1){
-            result *= base;
-            result %= modulo;
+            result = (result * base) % modulo;
         }
-        exp /= 2;
+        exp = exp / 2;
         base = (base * base) % modulo;
     }
 
     return result;
 }
 
-/*  Greatest Common Divisor function using Euclidean algorithm.
-    https://en.wikipedia.org/wiki/Greatest_common_divisor#Euclidean_algorithm
-    https://en.wikipedia.org/wiki/Euclidean_algorithm#Implementations
-*/
-BigInt gcd(const BigInt &a, const BigInt &b){
+// /*  Greatest Common Divisor function using Euclidean algorithm.
+//     https://en.wikipedia.org/wiki/Greatest_common_divisor#Euclidean_algorithm
+//     https://en.wikipedia.org/wiki/Euclidean_algorithm#Implementations
+// */
+mpz_class gcd(const mpz_class &a, const mpz_class &b){
     if (b == 0){
         return a;
     }
@@ -75,21 +74,37 @@ BigInt gcd(const BigInt &a, const BigInt &b){
     https://en.wikipedia.org/wiki/Modular_multiplicative_inverse
     https://en.wikipedia.org/wiki/Extended_Euclidean_algorithm#Pseudocode
 */
-BigInt inverseMod(BigInt base, BigInt modulo){
+mpz_class inverseMod(mpz_class base, mpz_class modulo){
     // check gcd equal to 1
     if (gcd(base, modulo) > 1) {
         throw "gcd is not one";
     }
 
-    BigInt s = 0, old_s = 1;
-    BigInt r = modulo, old_r = base;
-    BigInt quotient;
+    mpz_class s = 0, old_s = 1;
+    mpz_class r = modulo, old_r = base;
+    mpz_class quotient;
 
     while(r > 0){
         quotient = old_r / r;
-        std::tie(old_r, r) = std::make_tuple(r, old_r - quotient * r);
-        std::tie(old_s, s) = std::make_tuple(s, old_s - quotient * s);
+        mpz_class temp_old_r = old_r; 
+        old_r = r;                    
+        r = temp_old_r - quotient * r;
+
+        mpz_class temp_old_s = old_s; 
+        old_s = s;                   
+        s = temp_old_s - quotient * s; 
     }
-    
+    if (old_s < 0){
+        old_s += modulo;
+    }
     return old_s;
+}
+
+long long bit_length(mpz_class num){
+    long long res = 0;
+    while (num > 0){
+        res+=1;
+        num = num / 2;
+    }
+    return res;
 }
