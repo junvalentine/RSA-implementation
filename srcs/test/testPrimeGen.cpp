@@ -1,5 +1,4 @@
-#include "PrimeGen.cpp"
-
+#include "../src/PrimeGen.cpp"
 #include <iostream>
 #include <cassert>
 

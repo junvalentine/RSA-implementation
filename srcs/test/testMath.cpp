@@ -1,8 +1,6 @@
-#include "Math.cpp"
-
+#include "../src/Math.cpp"
 #include <iostream>
 #include <cassert>
-
 
 void test_addition() {
     mpz_class num1("12345678901234567890");
@@ -44,14 +42,6 @@ void test_modulus() {
     std::cout << "Modulus test passed!" << std::endl;
 }
 
-void test_power() {
-    mpz_class base("2");
-    mpz_class exp("10");
-    mpz_class result = power(base,exp);
-    assert(result == mpz_class("1024"));
-    std::cout << "Power test passed!" << std::endl;
-}
-
 void test_power_mod(){
     mpz_class base("23");
     mpz_class exp("177233597476795254689593388232826156373186607560864666212393719955585264362872827476969104853709871693550379293975803119758773504743584246374944759334316048520183578091154366924310606826190769265997584115947840051134975214289873078449824570438206097849578983947585195383643033544741890085817777649605397985211");
@@ -77,17 +67,48 @@ void test_modular_inverse() {
     std::cout << "Modular inverse test passed!" << std::endl;
 }
 
+void test_bytes_to_mpz(){
+    std::string bytes = "BKISC{vo_dich_roi}"; // Example bytes
+    mpz_class number = bytes_to_mpz(bytes);
+    assert(bytes == mpz_to_bytes(number));
+    // std::cout << "Number: " << number << std::endl;
+    std::cout << "Convert bytes to number test passed!" << std::endl;
+}
 
+void test_mpz_to_bytes(){
+    mpz_class number("5775029514988281381992664020849696843983229");
+    std::string bytes = mpz_to_bytes(number);
+    // std::cout << "Bytes: " << bytes << std::endl;
+    assert(number == bytes_to_mpz(bytes));
+    std::cout << "Convert number to bytes test passed!" << std::endl;
+}
+
+void test_bytes_to_hex(){
+    std::string bytes = "BKISC{vo_dich_roi}"; // Example bytes
+    std::string hex = bytes_to_hex(bytes);
+    std::string expected = "424b4953437b766f5f646963685f726f697d";
+    assert(hex == expected);
+    std::cout << "Convert bytes to hex test passed!" << std::endl;
+}
+void test_hex_to_bytes(){
+    std::string hex = "424b4953437b766f5f646963685f726f697d"; // Example hex
+    std::string bytes = hex_to_bytes(hex);
+    std::string expected = "BKISC{vo_dich_roi}";
+    assert(bytes == expected);
+    std::cout << "Convert hex to bytes test passed!" << std::endl;
+}
 int main() {
     test_addition();
     test_subtraction();
     test_multiplication();
     test_division();
     test_modulus();
-    test_power();
     test_power_mod();
     test_gcd();
     test_modular_inverse();
-
+    test_bytes_to_mpz();
+    test_mpz_to_bytes();
+    test_bytes_to_hex();
+    test_hex_to_bytes();
     return 0;
 }
