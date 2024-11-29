@@ -1,7 +1,4 @@
-
-
 #include "Rsa.h"
-
 RSA:: RSA(){
 }
 
@@ -28,7 +25,7 @@ void RSA::importPublicKey(PublicKey publicKey){
     this->publicKey = publicKey;
 }
 
-void RSA::import (long long bits){
+void RSA::genKey(long long bits){
     privateKey.genPrivKey(bits, true);
     publicKey.getPubKey(privateKey);
 }

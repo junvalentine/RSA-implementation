@@ -95,12 +95,12 @@ mpz_class bytes_to_mpz(const std::string& bytes, bool big_endian = true) {
     return number;
 }
 
-std::string mpz_to_bytes(mpz_class number, bool big_endian = true) {
-    size_t count;
-    std::string bytes;
-    mpz_export(nullptr, &count, 1, 1, big_endian ? 1 : -1, 0, number.get_mpz_t());
-    bytes.resize(count);
-    mpz_export(bytes.data(), &count, 1, 1, big_endian ? 1 : -1, 0, number.get_mpz_t());
+std::string mpz_to_bytes(const mpz_class& number, bool big_endian = true) {
+    size_t size = (mpz_sizeinbase(number.get_mpz_t(), 2) + 7) / 8; // Determine byte size
+    std::string bytes(size, 0);
+    mpz_export(&bytes[0], nullptr, 
+               big_endian ? 1 : -1, // Word order (1 = big-endian, -1 = little-endian)
+               1, 0, 0, number.get_mpz_t());
     return bytes;
 }
 

@@ -2,13 +2,12 @@
 #include "PrimeGen.cpp"
 
 // for the requirement of assignment
-mpz_class calcPrivateExponent(mpz_class publicExponent, mpz_class prime1, mpz_class prime2){
+void calcPrivateExponent(mpz_class publicExponent, mpz_class prime1, mpz_class prime2, mpz_class &privateExponent, mpz_class &exponent1, mpz_class &exponent2, mpz_class &coefficient){
     mpz_class phi = (prime1 - 1) * (prime2 - 1);
-    mpz_class privateExponent = inverseMod(publicExponent, phi);
-    mpz_class exponent1 = privateExponent % (prime1 - 1);
-    mpz_class exponent2 = privateExponent % (prime2 - 1);
-    mpz_class coefficient = inverseMod(prime2, prime1);
-    return privateExponent, exponent1, exponent2, coefficient;
+    privateExponent = inverseMod(publicExponent, phi);
+    exponent1 = privateExponent % (prime1 - 1);
+    exponent2 = privateExponent % (prime2 - 1);
+    coefficient = inverseMod(prime2, prime1);
 }
 
 void PrivateKey::genPrivKey(long long bits, bool defaultE){
@@ -34,7 +33,7 @@ void PrivateKey::genPrivKey(long long bits, bool defaultE){
     modulus = prime1 * prime2;
     
     // calculate private exponent
-    privateExponent, exponent1, exponent2, coefficient = calcPrivateExponent(publicExponent, prime1, prime2);
+    calcPrivateExponent(publicExponent, prime1, prime2, privateExponent, exponent1, exponent2, coefficient);
     
 }
 
