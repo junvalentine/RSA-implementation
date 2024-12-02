@@ -87,6 +87,7 @@ long long bit_length(mpz_class num){
     return res;
 }
 
+// Helper
 mpz_class bytes_to_mpz(const std::string& bytes, bool big_endian = true) {
     mpz_class number;
     mpz_import(number.get_mpz_t(), bytes.size(), 
@@ -95,14 +96,27 @@ mpz_class bytes_to_mpz(const std::string& bytes, bool big_endian = true) {
     return number;
 }
 
-std::string mpz_to_bytes(const mpz_class& number, bool big_endian = true) {
-    size_t size = (mpz_sizeinbase(number.get_mpz_t(), 2) + 7) / 8; // Determine byte size
-    std::string bytes(size, 0);
+std::string mpz_to_bytes(const mpz_class& number, bool big_endian = true, size_t desired_len = 0) {
+    size_t actual_size = (mpz_sizeinbase(number.get_mpz_t(), 2) + 7) / 8; 
+    std::string bytes(actual_size, 0);
+
+    // Export the number to a byte array
     mpz_export(&bytes[0], nullptr, 
                big_endian ? 1 : -1, // Word order (1 = big-endian, -1 = little-endian)
                1, 0, 0, number.get_mpz_t());
-    return bytes;
+
+    if (desired_len > actual_size) {
+        std::string padding(desired_len - actual_size, 0);
+        if (big_endian) {
+            return padding + bytes; 
+        } else {
+            return bytes + padding; 
+        }
+    } 
+
+    return bytes; 
 }
+
 
 std::string bytes_to_hex(const std::string& bytes) {
     std::ostringstream hex_stream;
@@ -131,4 +145,19 @@ std::string hex_to_bytes(const std::string& hex) {
     }
 
     return bytes;
+}
+
+std::string xor_string(const std::string& str1, const std::string& str2) {
+    if (str1.length() != str2.length()) {
+        throw std::invalid_argument("Strings must be of the same length for XOR operation.");
+    }
+
+    std::string result;
+    result.reserve(str1.length()); // Reserve space for performance
+
+    for (size_t i = 0; i < str1.length(); ++i) {
+        result.push_back(str1[i] ^ str2[i]);
+    }
+
+    return result;
 }

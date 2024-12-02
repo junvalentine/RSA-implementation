@@ -13,6 +13,7 @@ class RSA
         PrivateKey privateKey;
         PublicKey publicKey;
 	public:
+        int len;
         RSA();
         // generate key pair with given bits
         RSA(long long bits);
@@ -28,6 +29,8 @@ class RSA
         std::string encrypt(std::string message);
         std::string decrypt(std::string message);
         std::string decryptCRT(std::string message);
+        std::string OAEP_encrypt(std::string message, std::string label);
+        std::string OAEP_decrypt(std::string ciphertext, std::string label);
 
         mpz_class encrypt(mpz_class message);
         mpz_class decrypt(mpz_class message);
